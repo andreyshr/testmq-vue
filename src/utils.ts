@@ -28,11 +28,20 @@ export function useLatestOnly<TArgs extends any[], TResult>(
 
 export function getRange() {
   const years = [];
-  const currentYear = new Date().getFullYear();
 
-  for (let y = currentYear - 120; y <= currentYear; y++) {
+  for (let y = 1700; y <= 2035; y++) {
     years.push(y);
   }
 
   return years;
 }
+
+// if its neccessary to get range for 120 years you can use something like
+//   const years = [];
+//   const currentYear = new Date().getFullYear();
+
+//   for (let y = currentYear - 120; y <= currentYear; y++) {
+//     years.push(y);
+//   }
+
+//   return years;
