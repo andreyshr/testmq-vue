@@ -1,14 +1,15 @@
 import { DBClient } from "./db";
+import type { DBConfig, DBStore } from "./types";
 
-let dbInstance = new DBClient();
-let initPromise: Promise<DBClient> | null = null;
+let dbInstances: Map<string, Promise<DBClient>> = new Map();
 
-const stores = [
-  { name: "temperature", params: { keyPath: "t" } },
-  { name: "precipitation", params: { keyPath: "t" } },
-];
-
-export function useDb(): Promise<DBClient> {
-  initPromise = dbInstance.init(stores).then(() => dbInstance);
-  return initPromise!;
+export function openDb(config: DBConfig, stores: DBStore[]): Promise<DBClient> {
+  if (!dbInstances.has(config.name)) {
+    const instance = new DBClient(config);
+    dbInstances.set(
+      config.name,
+      instance.init(stores).then(() => instance)
+    );
+  }
+  return dbInstances.get(config.name)!;
 }

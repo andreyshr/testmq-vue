@@ -1,23 +1,30 @@
 <script setup lang="ts">
-import { ref, onMounted, useTemplateRef, computed, watch } from "vue";
+import {
+  ref,
+  useTemplateRef,
+  onMounted,
+  onUnmounted,
+  computed,
+  watch,
+} from "vue";
 import { getRange } from "./utils";
 import { Chart } from "./libs/chart";
-import { TemperatureRepository } from "./entities/temperature";
-import { PrecipitationRepository } from "./entities/precipitation";
-import type { DataRepository, DataType } from "./types";
+import type { DataType } from "./types";
+import { ClimateDataRepository } from "./entities/climate-data";
 
 const chartElement = useTemplateRef("chart-box");
 
 let chart: Chart | null = null;
+
 let isLoading = ref(false);
 let currentRequestId = 0;
-const dataRepos: Record<DataType, DataRepository> = {
-  temperature: new TemperatureRepository(),
-  precipitation: new PrecipitationRepository(),
-};
 
+const climateDataRepository = new ClimateDataRepository();
 const activeDataType = ref<DataType>("temperature");
+
 const years = getRange();
+const from = ref(years[0]!);
+const to = ref(years.at(-1)!);
 
 const fromAvailableYears = computed(() =>
   years.slice(0, years.findIndex((item) => item === to.value) + 1)
@@ -26,9 +33,6 @@ const fromAvailableYears = computed(() =>
 const toAvailableYears = computed(() =>
   years.slice(years.findIndex((item) => item === from.value))
 );
-
-const from = ref(years[0]!);
-const to = ref(years.at(-1)!);
 
 watch(
   [from, to, activeDataType],
@@ -47,12 +51,16 @@ onMounted(async () => {
   }
 });
 
+onUnmounted(() => {
+  chart?.destroy();
+  chart = null;
+});
+
 async function updateChartData(from: string, to: string, type: DataType) {
   const requestId = ++currentRequestId;
   isLoading.value = true;
 
-  const repo = dataRepos[type];
-  const data = await repo.getByRange(from, to);
+  const data = await climateDataRepository.getByTypeAndRange(type, from, to);
   if (requestId !== currentRequestId) return;
 
   if (data) chart?.updateData(data);
@@ -64,7 +72,7 @@ function setActiveDataType(type: DataType) {
   activeDataType.value = type;
 }
 
-function buttonClass(type: DataType) {
+function buttonClasses(type: DataType) {
   return { button: true, "button--active": activeDataType.value === type };
 }
 </script>
@@ -73,13 +81,13 @@ function buttonClass(type: DataType) {
   <div class="content">
     <div class="sidebar">
       <button
-        :class="buttonClass('temperature')"
+        :class="buttonClasses('temperature')"
         @click="setActiveDataType('temperature')"
       >
         Температура
       </button>
       <button
-        :class="buttonClass('precipitation')"
+        :class="buttonClasses('precipitation')"
         @click="setActiveDataType('precipitation')"
       >
         Осадки

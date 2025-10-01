@@ -2,6 +2,7 @@ import * as OPTIONS from "./constants";
 import type { DataPoint, DomPoint, AxesExtremes } from "./types";
 
 export class Chart {
+  private container: HTMLElement;
   private canvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
   private data: DataPoint[] = [];
@@ -23,6 +24,7 @@ export class Chart {
     height: number,
     data: DataPoint[] = []
   ) {
+    this.container = container;
     this.canvas = document.createElement("canvas");
     this.context = this.canvas.getContext("2d") as CanvasRenderingContext2D;
     this.dpr = window.devicePixelRatio || OPTIONS.BASE_DPR;
@@ -50,6 +52,21 @@ export class Chart {
     this.setExtremes();
     this.setPoints();
     this.render();
+  }
+
+  destroy() {
+    if (this.canvas && this.container.contains(this.canvas)) {
+      this.container.removeChild(this.canvas);
+    }
+
+    this.data = [];
+    this.points = [];
+    // @ts-expect-error
+    this.context = null;
+    // @ts-expect-error
+    this.canvas = null;
+    // @ts-expect-error
+    this.container = null;
   }
 
   private setSize(width: number, height: number) {
@@ -85,7 +102,6 @@ export class Chart {
   }
 
   private render() {
-    console.log("render");
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.renderAxes();

@@ -1,5 +1,5 @@
 export interface DBConfig {
-  name?: string;
+  name: string;
   version?: number;
 }
 

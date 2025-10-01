@@ -5,9 +5,9 @@ export class DBClient {
   private readonly name: string;
   private readonly version: number;
 
-  constructor(config: DBConfig = {}) {
-    this.name = config.name ?? "climateDB";
-    this.version = config.version ?? 1;
+  constructor(config: DBConfig) {
+    this.name = config?.name;
+    this.version = config?.version ?? 1;
   }
 
   async init(stores: DBStore[]): Promise<void> {
