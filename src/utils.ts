@@ -13,19 +13,6 @@ export async function getData<T>(url: string): Promise<T[]> {
   throw new Error();
 }
 
-export function useLatestOnly<TArgs extends any[], TResult>(
-  fn: (...args: TArgs) => Promise<TResult>
-) {
-  let callId = 0;
-
-  return async (...args: TArgs): Promise<TResult | undefined> => {
-    const id = ++callId;
-    const result = await fn(...args);
-    if (id !== callId) return;
-    return result;
-  };
-}
-
 export function getRange() {
   const years = [];
 
@@ -36,7 +23,8 @@ export function getRange() {
   return years;
 }
 
-// if its neccessary to get range for 120 years you can use something like
+// if it's neccessary to get range of 120 years you can use something like
+// export function getRange() {
 //   const years = [];
 //   const currentYear = new Date().getFullYear();
 
@@ -45,3 +33,4 @@ export function getRange() {
 //   }
 
 //   return years;
+// }
