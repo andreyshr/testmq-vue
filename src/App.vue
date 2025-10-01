@@ -61,10 +61,11 @@ async function updateChartData(from: string, to: string, type: DataType) {
   isLoading.value = true;
 
   const data = await climateDataRepository.getByRange(type, from, to);
-  if (requestId !== currentRequestId) return;
+  const isLastRequest = requestId === currentRequestId;
 
-  if (data) chart?.updateData(data);
+  if (!isLastRequest) return;
 
+  chart?.updateData(data);
   isLoading.value = false;
 }
 

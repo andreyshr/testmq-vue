@@ -18,8 +18,9 @@ export class ClimateDataRepository {
 
     const db = await this.dbConnection;
     let result = await db.getByRange<ItemData>(type, from, to);
+    const isLastRequest = requestId === this.currentRequestId;
 
-    if (!result.length && requestId === this.currentRequestId) {
+    if (!result.length && isLastRequest) {
       const data = await getData<ItemData>(`../data/${type}.json`);
       await db.addData(type, data);
       result = await db.getByRange(type, from, to);
