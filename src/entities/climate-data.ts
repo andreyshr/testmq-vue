@@ -9,7 +9,7 @@ export class ClimateDataRepository {
   ]);
   private currentRequestId = 0;
 
-  async getByTypeAndRange(
+  async getByRange(
     type: DataType,
     from: string,
     to: string
