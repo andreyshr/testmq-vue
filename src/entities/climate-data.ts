@@ -21,7 +21,7 @@ export class ClimateDataRepository {
     const isLastRequest = requestId === this.currentRequestId;
 
     if (!result.length && isLastRequest) {
-      const data = await getData<ItemData>(`../data/${type}.json`);
+      const data = await getData<ItemData>(`/data/${type}.json`);
       await db.addData(type, data);
       result = await db.getByRange(type, from, to);
     }
